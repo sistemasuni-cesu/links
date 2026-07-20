@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Área do Aluno</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #0A2647;
+    --navy-soft: #16375F;
+    --accent: #0072AD;
+    --accent-deep: #004A78;
+    --cream: #FFF8F1;
+    --card: #FFFFFF;
+    --sky-tint: #E1F0F9;
+    --ink: #142438;
+    --ink-soft: #5C6B7F;
+    --ok: #1F9D55;
+    --closed: #C23B3B;
+    --radius: 20px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  body{
+    background:
+      radial-gradient(circle at 15% -10%, rgba(0,114,173,0.16), transparent 45%),
+      radial-gradient(circle at 100% 0%, rgba(10,38,71,0.12), transparent 40%),
+      var(--cream);
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding: 32px 16px 60px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width: 480px;
+  }
+
+  header{
+    text-align:center;
+    margin-bottom: 28px;
+  }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background: var(--navy);
+    color: #fff;
+    font-family:'Poppins', sans-serif;
+    font-weight:600;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+  }
+
+  h1{
+    font-family:'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    color: var(--navy);
+    line-height:1.15;
+    margin-bottom: 8px;
+  }
+
+  h1 span{ color: var(--accent); }
+
+  header p{
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+
+  /* status pill - signature element */
+  .status-pill{
+    margin: 20px auto 0;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background: var(--card);
+    border: 1px solid rgba(10,38,71,0.08);
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 6px 20px rgba(10,38,71,0.06);
+  }
+  .dot{
+    width:9px; height:9px; border-radius:50%;
+    background: var(--ok);
+    box-shadow: 0 0 0 4px rgba(31,157,85,0.15);
+  }
+  .dot.closed{
+    background: var(--closed);
+    box-shadow: 0 0 0 4px rgba(194,59,59,0.15);
+  }
+
+  .cards{
+    display:flex;
+    flex-direction:column;
+    gap: 16px;
+    margin-top: 26px;
+  }
+
+  .card{
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: 0 10px 30px rgba(10,38,71,0.06);
+    border: 1px solid rgba(10,38,71,0.05);
+  }
+
+  .card-top{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom: 14px;
+  }
+
+  .icon{
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: var(--sky-tint);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  .icon svg{ width:22px; height:22px; }
+
+  .card h2{
+    font-family:'Poppins', sans-serif;
+    font-size: 17px;
+    color: var(--navy);
+    font-weight: 700;
+  }
+
+  .card p, .card .row{
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    line-height:1.55;
+  }
+
+  .schedule-row{
+    display:flex;
+    justify-content:space-between;
+    padding: 9px 0;
+    border-bottom: 1px dashed rgba(10,38,71,0.1);
+    font-size: 14.5px;
+  }
+  .schedule-row:last-child{ border-bottom:none; }
+  .schedule-row .days{ color: var(--ink); font-weight:600; }
+  .schedule-row .hours{ color: var(--ink-soft); }
+
+  .btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    width:100%;
+    margin-top: 16px;
+    padding: 13px 18px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    color: #fff;
+    font-family:'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 14.5px;
+    text-decoration:none;
+    cursor:pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+    box-shadow: 0 8px 18px rgba(0,74,120,0.28);
+  }
+  .btn:active{ transform: scale(0.98); }
+
+  .btn.secondary{
+    background: var(--navy);
+    box-shadow: 0 8px 18px rgba(10,38,71,0.22);
+  }
+
+  .email-box{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 4px;
+  }
+  .email-box span{
+    font-size: 14px;
+    color: var(--navy);
+    font-weight:600;
+    word-break: break-all;
+  }
+  .copy-btn{
+    flex-shrink:0;
+    background: var(--navy);
+    color:#fff;
+    border:none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12.5px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .copy-btn.copied{ background: var(--ok); }
+
+  footer{
+    text-align:center;
+    margin-top: 32px;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="badge">Área do Aluno</div>
+    <h1>Que bom te ver <span>por aqui</span> 🎓</h1>
+    <p>Tudo que você precisa do multiatendimento, em um só lugar.</p>
+
+    <div class="status-pill" id="statusPill">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">Verificando horário…</span>
+    </div>
+  </header>
+
+  <div class="cards">
+
+    <!-- Horário -->
+    <div class="card">
+      <div class="card-top">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="9" stroke="#004A78" stroke-width="1.8"/>
+            <path d="M12 7v5l3.5 2" stroke="#004A78" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2>Horário de Atendimento</h2>
+      </div>
+      <div class="schedule-row">
+        <span class="days">Segunda a sexta</span>
+        <span class="hours">08h às 21h30</span>
+      </div>
+      <div class="schedule-row">
+        <span class="days">Sábado</span>
+        <span class="hours">08h às 12h</span>
+      </div>
+    </div>
+
+    <!-- Manual -->
+    <div class="card">
+      <div class="card-top">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 4h9l3 3v13a1 1 0 01-1 1H6a1 1 0 01-1-1V5a1 1 0 011-1z" stroke="#004A78" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M9 12h6M9 16h6M9 8h3" stroke="#004A78" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h2>Manual do Aluno</h2>
+      </div>
+      <p>Baixe o manual completo com tudo sobre a sua jornada acadêmica.</p>
+      <a class="btn" href="manual-do-aluno.pdf" target="_blank" rel="noopener">
+        Baixar manual do aluno
+      </a>
+    </div>
+
+    <!-- Email -->
+    <div class="card">
+      <div class="card-top">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3.5" y="5.5" width="17" height="13" rx="2" stroke="#004A78" stroke-width="1.8"/>
+            <path d="M4 6.5l8 6.5 8-6.5" stroke="#004A78" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2>Fale com o Multiatendimento</h2>
+      </div>
+      <p>Prefere e-mail? Fala com a gente por aqui:</p>
+      <div class="email-box">
+        <span id="emailText">multiatendimento.pgo@unicesumar.edu.br</span>
+        <button class="copy-btn" id="copyBtn" onclick="copyEmail()">Copiar</button>
+      </div>
+      <a class="btn secondary" href="mailto:multiatendimento.pgo@unicesumar.edu.br?subject=Contato%20pelo%20Linktree">
+        Abrir e-mail
+      </a>
+    </div>
+
+  </div>
+
+  <footer>Unicesumar · Ponta Grossa</footer>
+</div>
+
+<script>
+  function copyEmail(){
+    const email = document.getElementById('emailText').innerText;
+    navigator.clipboard.writeText(email).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.innerText = 'Copiado!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.innerText = 'Copiar';
+        btn.classList.remove('copied');
+      }, 1800);
+    });
+  }
+
+  function updateStatus(){
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+    const day = now.getDay(); // 0 = domingo, 6 = sábado
+    const minutes = now.getHours() * 60 + now.getMinutes();
+
+    let open = false;
+    let nextInfo = '';
+
+    if (day >= 1 && day <= 5) {
+      // segunda a sexta: 08:00 - 21:30
+      open = minutes >= (8*60) && minutes < (21*60 + 30);
+      nextInfo = open ? 'Atendimento aberto agora' : 'Fechado agora · abre às 08h';
+    } else if (day === 6) {
+      // sábado: 08:00 - 12:00
+      open = minutes >= (8*60) && minutes < (12*60);
+      nextInfo = open ? 'Atendimento aberto agora' : 'Fechado agora · abre às 08h';
+    } else {
+      // domingo
+      open = false;
+      nextInfo = 'Fechado agora · abre segunda às 08h';
+    }
+
+    const dot = document.getElementById('statusDot');
+    const text = document.getElementById('statusText');
+    text.innerText = nextInfo;
+    if(!open){ dot.classList.add('closed'); }
+  }
+
+  updateStatus();
+</script>
+
+</body>
+</html>
