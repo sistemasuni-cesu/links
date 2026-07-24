@@ -92,33 +92,32 @@
     max-width:560px;
   }
 
-  /* ---------- CONTROLS (sticky) ---------- */
-  .controls{
+  /* ---------- SEARCH BAR (sticky, leve — evita bug de repaint no Android/Chrome) ---------- */
+  .search-bar{
     position:sticky;
     top:0;
     z-index:20;
     background:var(--paper);
     border-bottom:1px solid var(--line);
     box-shadow:0 2px 14px rgba(26,33,56,0.06);
-  }
-  .controls-inner{
-    max-width:1100px;
-    margin:0 auto;
-    padding:16px 24px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    align-items:center;
+    /* força camada de composição própria: evita a área ficar "em branco" ao rolar no Chrome Android */
+    transform:translateZ(0);
+    -webkit-transform:translateZ(0);
+    will-change:transform;
+    backface-visibility:hidden;
   }
   .search-wrap{
     position:relative;
-    flex:1 1 260px;
+    max-width:1100px;
+    margin:0 auto;
+    padding:14px 24px;
   }
   .search-wrap svg{
     position:absolute;
-    left:14px; top:50%;
+    left:38px; top:50%;
     transform:translateY(-50%);
     color:var(--ink-mute);
+    pointer-events:none;
   }
   #search{
     width:100%;
@@ -137,6 +136,17 @@
     outline:none;
     border-color:var(--orange);
     background:#fff;
+  }
+
+  /* ---------- FILTERS (fluxo normal, não sticky) ---------- */
+  .filters{
+    max-width:1100px;
+    margin:0 auto;
+    padding:16px 24px 4px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-items:center;
   }
 
   .seg{
@@ -172,12 +182,10 @@
   .seg button:hover:not(.active){color:var(--ink);}
 
   .floor-chips{
-    max-width:1100px;
-    margin:0 auto;
-    padding:0 24px 16px;
     display:flex;
     gap:8px;
     flex-wrap:wrap;
+    width:100%;
   }
   .chip{
     display:inline-flex;
@@ -364,10 +372,11 @@
   /* ---------- TABLET ---------- */
   @media (max-width:768px){
     header{padding:22px 18px 18px;}
-    .controls-inner, .floor-chips, #resultCount, main, .legend-section{
+    .search-wrap, .filters, #resultCount, main, .legend-section{
       padding-left:18px;
       padding-right:18px;
     }
+    .search-wrap svg{left:32px;}
     .grid{grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));}
   }
 
@@ -378,16 +387,18 @@
     header p.sub{font-size:13.5px;}
     .eyebrow{font-size:10.5px; padding:4px 10px;}
 
-    .controls-inner, .floor-chips, #resultCount, main, .legend-section{
+    .search-wrap, .filters, #resultCount, main, .legend-section{
       padding-left:16px;
       padding-right:16px;
     }
-    .controls-inner{flex-direction:column; align-items:stretch; padding-top:14px; padding-bottom:12px; gap:10px;}
+    .search-wrap{padding-top:12px; padding-bottom:12px;}
+    .search-wrap svg{left:30px;}
+    .filters{flex-direction:column; align-items:stretch; padding-top:14px; padding-bottom:10px; gap:10px;}
     #search{padding:13px 14px 13px 42px; font-size:16px;} /* 16px evita zoom automático no iOS */
     .seg{overflow-x:auto; width:100%;}
     .seg button{padding:10px 14px; font-size:13px;}
 
-    .floor-chips{padding-bottom:14px; gap:7px;}
+    .floor-chips{gap:7px;}
     .chip{font-size:12px; padding:7px 12px 7px 9px;}
 
     #resultCount{font-size:12.5px; padding-top:12px;}
@@ -443,17 +454,18 @@
   </div>
 </header>
 
-<div class="controls">
-  <div class="controls-inner">
-    <div class="search-wrap">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="search" placeholder="Buscar curso, turma ou sala (ex: PSI2S, sala 34, direito)…" autocomplete="off">
-    </div>
-    <div class="seg" id="turnoSeg">
-      <button data-turno="ALL" class="active">Todos</button>
-      <button data-turno="MA">Matutino</button>
-      <button data-turno="NA">Noturno</button>
-    </div>
+<div class="search-bar">
+  <div class="search-wrap">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search" placeholder="Buscar curso, turma ou sala (ex: PSI2S, sala 34, direito)…" autocomplete="off">
+  </div>
+</div>
+
+<div class="filters">
+  <div class="seg" id="turnoSeg">
+    <button data-turno="ALL" class="active">Todos</button>
+    <button data-turno="MA">Matutino</button>
+    <button data-turno="NA">Noturno</button>
   </div>
   <div class="floor-chips" id="floorChips"></div>
 </div>
