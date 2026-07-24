@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ensalamento 2026.2 — Consulta de Salas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,500&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange: #EE6C0C;
+    --orange-deep: #C9500A;
+    --orange-soft: #FFE7D3;
+    --navy: #1A2138;
+    --navy-soft: #4A5170;
+    --bg: #F7F4EF;
+    --paper: #FFFFFF;
+    --line: #E9E3D9;
+    --ink: #24283B;
+    --ink-mute: #6B7089;
+
+    /* Sinalização por andar — cada andar tem uma cor fixa, usada em toda a página */
+    --f-m2: #3B5BA5;   /* -2 */
+    --f-m1: #4E8CA6;   /* -1 */
+    --f-t:  #3F8F5F;   /* Térreo */
+    --f-1:  #C9860B;   /* 1° */
+    --f-2:  #C9500A;   /* 2° */
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    font-family:'Poppins', sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    background: linear-gradient(135deg, var(--navy) 0%, #262E4C 100%);
+    color:#fff;
+    padding:28px 24px 22px;
+    position:relative;
+    overflow:hidden;
+  }
+  header::before{
+    content:"";
+    position:absolute;
+    top:-60%; right:-10%;
+    width:420px; height:420px;
+    background: radial-gradient(circle, rgba(238,108,12,0.35) 0%, rgba(238,108,12,0) 70%);
+    pointer-events:none;
+  }
+  .header-inner{
+    max-width:1100px;
+    margin:0 auto;
+    position:relative;
+    z-index:1;
+  }
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--orange);
+    background:rgba(238,108,12,0.14);
+    border:1px solid rgba(238,108,12,0.4);
+    padding:5px 12px;
+    border-radius:999px;
+    margin-bottom:14px;
+  }
+  .eyebrow span.dot{width:6px;height:6px;border-radius:50%;background:var(--orange);}
+  h1{
+    font-size:clamp(26px, 4vw, 38px);
+    font-weight:700;
+    letter-spacing:-0.01em;
+    line-height:1.15;
+  }
+  header p.sub{
+    margin-top:8px;
+    color:#C4C9DE;
+    font-size:15px;
+    font-weight:400;
+    max-width:560px;
+  }
+
+  /* ---------- CONTROLS (sticky) ---------- */
+  .controls{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 2px 14px rgba(26,33,56,0.06);
+  }
+  .controls-inner{
+    max-width:1100px;
+    margin:0 auto;
+    padding:16px 24px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-items:center;
+  }
+  .search-wrap{
+    position:relative;
+    flex:1 1 260px;
+  }
+  .search-wrap svg{
+    position:absolute;
+    left:14px; top:50%;
+    transform:translateY(-50%);
+    color:var(--ink-mute);
+  }
+  #search{
+    width:100%;
+    padding:12px 14px 12px 42px;
+    border-radius:12px;
+    border:1.5px solid var(--line);
+    font-family:'Poppins', sans-serif;
+    font-size:14.5px;
+    font-weight:500;
+    background:var(--bg);
+    color:var(--ink);
+    transition:border-color .15s, background .15s;
+  }
+  #search::placeholder{color:var(--ink-mute); font-weight:400;}
+  #search:focus{
+    outline:none;
+    border-color:var(--orange);
+    background:#fff;
+  }
+
+  .seg{
+    display:flex;
+    background:var(--bg);
+    border:1.5px solid var(--line);
+    border-radius:12px;
+    padding:3px;
+    gap:2px;
+  }
+  .seg button{
+    font-family:'Poppins', sans-serif;
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--ink-mute);
+    background:transparent;
+    border:none;
+    padding:9px 16px;
+    border-radius:9px;
+    cursor:pointer;
+    transition:all .15s;
+    white-space:nowrap;
+  }
+  .seg button.active{
+    background:var(--navy);
+    color:#fff;
+  }
+  .seg button:hover:not(.active){color:var(--ink);}
+
+  .floor-chips{
+    max-width:1100px;
+    margin:0 auto;
+    padding:0 24px 16px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .chip{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-family:'Poppins', sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    padding:7px 13px 7px 10px;
+    border-radius:999px;
+    border:1.5px solid var(--line);
+    background:#fff;
+    color:var(--ink-mute);
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .chip .sw{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .chip.active{
+    color:#fff;
+    border-color:transparent;
+  }
+  .chip:hover{transform:translateY(-1px);}
+
+  #resultCount{
+    max-width:1100px;
+    margin:0 auto;
+    padding:14px 24px 4px;
+    font-size:13px;
+    font-weight:500;
+    color:var(--ink-mute);
+  }
+  #resultCount b{color:var(--navy); font-weight:700;}
+
+  /* ---------- GRID ---------- */
+  main{
+    max-width:1100px;
+    margin:0 auto;
+    padding:8px 24px 60px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));
+    gap:16px;
+    margin-top:14px;
+  }
+
+  .card{
+    background:var(--paper);
+    border:1.5px solid var(--line);
+    border-radius:16px;
+    padding:20px 20px 8px;
+    transition:box-shadow .2s, transform .2s, border-color .2s;
+  }
+  .card:hover{
+    box-shadow:0 10px 28px rgba(26,33,56,0.09);
+    transform:translateY(-2px);
+    border-color:#DCD4C4;
+  }
+
+  .card-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:14px;
+    padding-bottom:14px;
+    border-bottom:1px dashed var(--line);
+  }
+  .course-name{
+    font-size:15.5px;
+    font-weight:700;
+    color:var(--navy);
+    line-height:1.3;
+    letter-spacing:-.01em;
+  }
+  .turno-badge{
+    flex-shrink:0;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding:5px 10px;
+    border-radius:8px;
+    white-space:nowrap;
+  }
+  .turno-badge.MA{background:var(--orange-soft); color:var(--orange-deep);}
+  .turno-badge.NA{background:#232A44; color:#C4C9DE;}
+
+  .row{
+    display:grid;
+    grid-template-columns:1fr auto auto;
+    align-items:center;
+    gap:10px;
+    padding:9px 0;
+    border-bottom:1px solid #F1EDE4;
+  }
+  .row:last-child{border-bottom:none;}
+  .turma{
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .sala{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    font-weight:700;
+    color:var(--navy);
+    background:var(--bg);
+    padding:4px 10px;
+    border-radius:7px;
+    min-width:52px;
+    text-align:center;
+  }
+  .andar-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:11.5px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:999px;
+    color:#fff;
+    white-space:nowrap;
+    min-width:64px;
+    justify-content:center;
+  }
+
+  .empty{
+    grid-column:1/-1;
+    text-align:center;
+    padding:60px 20px;
+    color:var(--ink-mute);
+  }
+  .empty svg{margin-bottom:14px; opacity:.5;}
+  .empty p{font-size:14.5px; font-weight:500;}
+
+  /* ---------- LEGEND ---------- */
+  .legend-section{
+    max-width:1100px;
+    margin:36px auto 0;
+    padding:0 24px;
+  }
+  .legend-box{
+    background:var(--paper);
+    border:1.5px solid var(--line);
+    border-radius:16px;
+    padding:20px 22px;
+  }
+  .legend-title{
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--ink-mute);
+    margin-bottom:14px;
+  }
+  .legend-strip{
+    display:flex;
+    border-radius:10px;
+    overflow:hidden;
+    height:44px;
+    margin-bottom:4px;
+  }
+  .legend-strip div{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:.02em;
+  }
+
+  footer{
+    text-align:center;
+    padding:26px 24px 40px;
+    font-size:12.5px;
+    color:var(--ink-mute);
+  }
+
+  @media (max-width:640px){
+    .controls-inner{flex-direction:column; align-items:stretch;}
+    .seg{overflow-x:auto;}
+    .row{grid-template-columns:1fr auto; row-gap:6px;}
+    .andar-badge{grid-column:1/-1; justify-self:start;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important; scroll-behavior:auto !important;}
+  }
+
+  :focus-visible{outline:2.5px solid var(--orange); outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="eyebrow"><span class="dot"></span> Ensalamento &middot; Mídia Móvel</div>
+    <h1>Horários de Aula 2026.2</h1>
+    <p class="sub">Encontre rapidamente a sala, o andar e a turma do seu curso. Busque pelo nome do curso, código da turma ou número da sala.</p>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="controls-inner">
+    <div class="search-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search" placeholder="Buscar curso, turma ou sala (ex: PSI2S, sala 34, direito)…" autocomplete="off">
+    </div>
+    <div class="seg" id="turnoSeg">
+      <button data-turno="ALL" class="active">Todos</button>
+      <button data-turno="MA">Matutino</button>
+      <button data-turno="NA">Noturno</button>
+    </div>
+  </div>
+  <div class="floor-chips" id="floorChips"></div>
+</div>
+
+<div id="resultCount"></div>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div class="legend-section">
+  <div class="legend-box">
+    <div class="legend-title">Sinalização de andares</div>
+    <div class="legend-strip" id="legendStrip"></div>
+  </div>
+</div>
+
+<footer>Ensalamento 2026.2 &middot; Consulte a coordenação do curso em caso de divergência de sala.</footer>
+
+<script>
+const FLOORS = {
+  "-2": { label: "-2", name: "2º Subsolo", color: "var(--f-m2)" },
+  "-1": { label: "-1", name: "1º Subsolo", color: "var(--f-m1)" },
+  "TÉRREO": { label: "Térreo", name: "Térreo", color: "var(--f-t)" },
+  "1°": { label: "1º andar", name: "1º Andar", color: "var(--f-1)" },
+  "2°": { label: "2º andar", name: "2º Andar", color: "var(--f-2)" }
+};
+
+// normaliza variações de digitação do andar (º vs °)
+function normFloor(raw){
+  const r = raw.trim().toUpperCase().replace("º","°");
+  if (r === "1°") return "1°";
+  if (r === "2°") return "2°";
+  if (r === "TÉRREO" || r === "TERREO") return "TÉRREO";
+  return r;
+}
+
+const DATA = [
+  {curso:"Odontologia", turno:"MA", salas:[
+    {turma:"ODO2S-MA", sala:"03", andar:"-2"},
+    {turma:"ODO4S-MA", sala:"01", andar:"-2"},
+    {turma:"ODO6S-MA", sala:"02", andar:"-2"},
+    {turma:"ODO8S-MA", sala:"CLÍNICA", andar:"-2"},
+  ]},
+  {curso:"Psicologia", turno:"MA", salas:[
+    {turma:"PSI2S-MA", sala:"17", andar:"TÉRREO"},
+    {turma:"PSI4S-MA", sala:"18", andar:"TÉRREO"},
+    {turma:"PSI6S-MA", sala:"20", andar:"TÉRREO"},
+    {turma:"PSI8S-MA", sala:"19", andar:"TÉRREO"},
+    {turma:"PSI10S-MA", sala:"21", andar:"TÉRREO"},
+  ]},
+  {curso:"Medicina Veterinária", turno:"MA", salas:[
+    {turma:"VET2S-MA", sala:"69", andar:"2°"},
+    {turma:"VET4S-MA", sala:"59", andar:"1°"},
+    {turma:"VET6S-MA", sala:"42", andar:"1°"},
+    {turma:"VET8S-MA", sala:"39", andar:"1°"},
+  ]},
+  {curso:"Biomedicina", turno:"MA", salas:[
+    {turma:"BIO2S-MA", sala:"13", andar:"-1"},
+    {turma:"BIO4S-MA", sala:"06", andar:"-1"},
+  ]},
+  {curso:"Fisioterapia", turno:"MA", salas:[
+    {turma:"FIS2S-MA", sala:"12", andar:"-1"},
+    {turma:"FIS4S-MA", sala:"41", andar:"1°"},
+  ]},
+  {curso:"Administração", turno:"NA", salas:[
+    {turma:"ADM2S-NA", sala:"82", andar:"2°"},
+    {turma:"ADM4S-NA", sala:"75", andar:"2°"},
+    {turma:"ADM6S-NA", sala:"74", andar:"2°"},
+    {turma:"ADM8S-NA", sala:"70", andar:"2°"},
+  ]},
+  {curso:"Publicidade e Propaganda", turno:"NA", salas:[
+    {turma:"PUB2S-NA", sala:"62", andar:"2°"},
+    {turma:"PUB4S-NA", sala:"63", andar:"2°"},
+    {turma:"PUB6S-NA", sala:"64", andar:"2°"},
+  ]},
+  {curso:"Agronomia", turno:"NA", salas:[
+    {turma:"AGRO2S-NA", sala:"42", andar:"1°"},
+    {turma:"AGRO2S-NB", sala:"45", andar:"1°"},
+    {turma:"AGRO4S-NA", sala:"38", andar:"1°"},
+    {turma:"AGRO4S-NB", sala:"39", andar:"1°"},
+    {turma:"AGRO6S-NA", sala:"40", andar:"1°"},
+    {turma:"AGRO8S-NA", sala:"41", andar:"1°"},
+    {turma:"AGRO10S-NA", sala:"53", andar:"1°"},
+  ]},
+  {curso:"Arquitetura", turno:"NA", salas:[
+    {turma:"ARQ2S-NA", sala:"34", andar:"TÉRREO"},
+    {turma:"ARQ4S-NA", sala:"LAB. D", andar:"TÉRREO"},
+    {turma:"ARQ6S-NA", sala:"LAB. E", andar:"TÉRREO"},
+    {turma:"ARQ8S-NA", sala:"HÍBRIDO D", andar:"TÉRREO"},
+    {turma:"ARQ10S-NA", sala:"35", andar:"TÉRREO"},
+  ]},
+  {curso:"Biomedicina", turno:"NA", salas:[
+    {turma:"BIO2S-NA", sala:"57", andar:"1°"},
+    {turma:"BIO2S-NB", sala:"58", andar:"1°"},
+    {turma:"BIO4S-NA", sala:"52", andar:"1°"},
+    {turma:"BIO6S-NA", sala:"60", andar:"1°"},
+    {turma:"BIO8S-NA", sala:"24", andar:"TÉRREO"},
+  ]},
+  {curso:"Enfermagem", turno:"NA", salas:[
+    {turma:"ENF2S-NA", sala:"27", andar:"TÉRREO"},
+    {turma:"ENF4S-NA", sala:"28", andar:"TÉRREO"},
+    {turma:"ENF6S-NA", sala:"29", andar:"TÉRREO"},
+    {turma:"ENF8S-NA", sala:"34", andar:"TÉRREO"},
+  ]},
+  {curso:"Direito", turno:"MA", salas:[
+    {turma:"DIR2S-MA", sala:"33", andar:"TÉRREO"},
+    {turma:"DIR4S-MA", sala:"35", andar:"TÉRREO"},
+    {turma:"DIR6S-MA", sala:"36", andar:"TÉRREO"},
+    {turma:"DIR8S-MA", sala:"37", andar:"TÉRREO"},
+  ]},
+  {curso:"Ciências Contábeis", turno:"NA", salas:[
+    {turma:"CCONT2S-NA", sala:"83", andar:"2°"},
+    {turma:"CCONT4S-NA", sala:"76", andar:"2°"},
+    {turma:"CCONT6S-NA", sala:"67", andar:"2°"},
+    {turma:"CCONT8S-NA", sala:"65", andar:"2°"},
+  ]},
+  {curso:"Direito", turno:"NA", salas:[
+    {turma:"DIR2S-NA", sala:"84", andar:"2°"},
+    {turma:"DIR2S-NB", sala:"73", andar:"2°"},
+    {turma:"DIR4S-NA", sala:"89", andar:"2°"},
+    {turma:"DIR6S-NA", sala:"56", andar:"2°"},
+    {turma:"DIR8S-NA", sala:"69", andar:"2°"},
+    {turma:"DIR10S-NA", sala:"71", andar:"2°"},
+  ]},
+  {curso:"Engenharia Civil", turno:"NA", salas:[
+    {turma:"CIV2S-NA", sala:"59", andar:"1°"},
+    {turma:"CIV4S-NA", sala:"51", andar:"1°"},
+    {turma:"CIV6S-NA", sala:"55", andar:"1°"},
+    {turma:"CIV8S-NA", sala:"54", andar:"1°"},
+  ]},
+  {curso:"Engenharia de Produção", turno:"NA", salas:[
+    {turma:"EPROD2S-NA", sala:"59", andar:"1°"},
+    {turma:"EPROD6S-NA", sala:"44", andar:"1°"},
+    {turma:"EPROD8S-NA", sala:"47", andar:"1°"},
+  ]},
+  {curso:"Análise e Desenvolvimento de Sistemas", turno:"NA", salas:[
+    {turma:"ADSIS2S-NA", sala:"36", andar:"1°"},
+    {turma:"ADSIS4S-NA", sala:"37", andar:"1°"},
+  ]},
+  {curso:"Engenharia Mecânica", turno:"NA", salas:[
+    {turma:"EMEC2S-NA", sala:"50", andar:"1°"},
+    {turma:"EMEC4S-NA", sala:"51", andar:"1°"},
+    {turma:"EMEC6S-NA", sala:"44", andar:"1°"},
+    {turma:"EMEC8S-NA", sala:"43", andar:"1°"},
+  ]},
+  {curso:"Engenharia de Software", turno:"NA", salas:[
+    {turma:"ESOFT2S-NA", sala:"8", andar:"-1"},
+    {turma:"ESOFT2S-NB", sala:"9", andar:"-1"},
+    {turma:"ESOFT4S-NA", sala:"14", andar:"-1"},
+    {turma:"ESOFT4S-NB", sala:"15", andar:"-1"},
+    {turma:"ESOFT6S-NA", sala:"21", andar:"TÉRREO"},
+    {turma:"ESOFT8S-NA", sala:"30", andar:"TÉRREO"},
+  ]},
+  {curso:"Estética e Cosmética", turno:"NA", salas:[
+    {turma:"COSM4S-NA", sala:"46", andar:"1°"},
+  ]},
+  {curso:"Fisioterapia", turno:"NA", salas:[
+    {turma:"FIS2S-NA", sala:"03", andar:"-2"},
+    {turma:"FIS4S-NA", sala:"01", andar:"-2"},
+    {turma:"FIS6S-NA", sala:"02", andar:"-2"},
+    {turma:"FIS8S-NA", sala:"22", andar:"TÉRREO"},
+    {turma:"FIS10S-NA", sala:"06", andar:"-1"},
+  ]},
+  {curso:"Farmácia", turno:"NA", salas:[
+    {turma:"FAR2S-NA", sala:"19", andar:"TÉRREO"},
+    {turma:"FAR4S-NA", sala:"17", andar:"TÉRREO"},
+    {turma:"FAR6S-NA", sala:"18", andar:"TÉRREO"},
+    {turma:"FAR8S-NA", sala:"20", andar:"TÉRREO"},
+  ]},
+  {curso:"Psicologia", turno:"NA", salas:[
+    {turma:"PSI2S-NA", sala:"16", andar:"-1"},
+    {turma:"PSI4S-NA", sala:"12", andar:"-1"},
+    {turma:"PSI6S-NA", sala:"04", andar:"-1"},
+    {turma:"PSI6S-NB", sala:"05", andar:"-1"},
+    {turma:"PSI8S-NA", sala:"13", andar:"-1"},
+    {turma:"PSI10S-NA", sala:"24", andar:"TÉRREO"},
+  ]},
+  {curso:"Processos Gerenciais", turno:"NA", salas:[
+    {turma:"PGER2S-NA", sala:"82", andar:"2°"},
+    {turma:"PGER4S-NA", sala:"75", andar:"2°"},
+  ]},
+  {curso:"Pedagogia", turno:"NA", salas:[
+    {turma:"PED2S-NA", sala:"72", andar:"2°"},
+    {turma:"PED4S-NA", sala:"78", andar:"2°"},
+  ]},
+  {curso:"Enfermagem", turno:"MA", salas:[
+    {turma:"ENF2S-MA", sala:"22", andar:"TÉRREO"},
+  ]},
+  {curso:"Nutrição", turno:"MA", salas:[
+    {turma:"NUT2S-MA", sala:"22", andar:"TÉRREO"},
+  ]},
+  {curso:"Nutrição", turno:"NA", salas:[
+    {turma:"NUT2S-NA", sala:"32", andar:"TÉRREO"},
+    {turma:"NUT4S-NA", sala:"31", andar:"TÉRREO"},
+    {turma:"NUT6S-NA", sala:"33", andar:"TÉRREO"},
+  ]},
+];
+
+// state
+let activeTurno = "ALL";
+let activeFloors = new Set();
+let query = "";
+
+// build floor chips
+const floorChipsEl = document.getElementById("floorChips");
+Object.entries(FLOORS).forEach(([key, f])=>{
+  const chip = document.createElement("button");
+  chip.className = "chip";
+  chip.dataset.floor = key;
+  chip.style.setProperty("--chip-color", f.color);
+  chip.innerHTML = `<span class="sw" style="background:${f.color}"></span>${f.label}`;
+  chip.addEventListener("click", ()=>{
+    if(activeFloors.has(key)){
+      activeFloors.delete(key);
+      chip.classList.remove("active");
+      chip.style.background = "#fff";
+      chip.style.color = "";
+    } else {
+      activeFloors.add(key);
+      chip.classList.add("active");
+      chip.style.background = f.color;
+      chip.style.color = "#fff";
+    }
+    render();
+  });
+  floorChipsEl.appendChild(chip);
+});
+
+// build legend strip
+const legendStripEl = document.getElementById("legendStrip");
+Object.values(FLOORS).forEach(f=>{
+  const div = document.createElement("div");
+  div.style.background = f.color;
+  div.textContent = f.name;
+  legendStripEl.appendChild(div);
+});
+
+// turno segmented control
+document.getElementById("turnoSeg").addEventListener("click", (e)=>{
+  const btn = e.target.closest("button");
+  if(!btn) return;
+  document.querySelectorAll("#turnoSeg button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  activeTurno = btn.dataset.turno;
+  render();
+});
+
+document.getElementById("search").addEventListener("input", (e)=>{
+  query = e.target.value.trim().toLowerCase();
+  render();
+});
+
+function matches(course, item){
+  if(activeTurno !== "ALL" && course.turno !== activeTurno) return false;
+  if(activeFloors.size > 0 && !activeFloors.has(normFloor(item.andar))) return false;
+  if(query){
+    const hay = `${course.curso} ${item.turma} ${item.sala}`.toLowerCase();
+    if(!hay.includes(query)) return false;
+  }
+  return true;
+}
+
+function render(){
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  let totalRooms = 0;
+  let totalCourses = 0;
+
+  DATA.forEach(course=>{
+    const rows = course.salas.filter(item=>matches(course, item));
+    if(rows.length === 0) return;
+    totalCourses++;
+    totalRooms += rows.length;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const head = document.createElement("div");
+    head.className = "card-head";
+    head.innerHTML = `
+      <div class="course-name">${course.curso}</div>
+      <div class="turno-badge ${course.turno}">${course.turno === "MA" ? "Matutino" : "Noturno"}</div>
+    `;
+    card.appendChild(head);
+
+    rows.forEach(item=>{
+      const f = FLOORS[normFloor(item.andar)] || {label:item.andar, color:"#999"};
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `
+        <div class="turma">${item.turma}</div>
+        <div class="sala">${item.sala}</div>
+        <div class="andar-badge" style="background:${f.color}">${f.label}</div>
+      `;
+      card.appendChild(row);
+    });
+
+    grid.appendChild(card);
+  });
+
+  if(totalCourses === 0){
+    grid.innerHTML = `
+      <div class="empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <p>Nenhuma sala encontrada para essa busca.</p>
+      </div>`;
+  }
+
+  document.getElementById("resultCount").innerHTML =
+    `<b>${totalCourses}</b> curso${totalCourses===1?"":"s"} &middot; <b>${totalRooms}</b> turma${totalRooms===1?"":"s"} encontrada${totalRooms===1?"":"s"}`;
+}
+
+render();
+</script>
+</body>
+</html>
